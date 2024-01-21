@@ -1,0 +1,45 @@
+% !TeX spellcheck = en_US
+\chapter{Backgrounds}%
+\hl{
+In the conclusion of this related work study, several survey papers were consulted, some of which shall be highlighted here for reference.}
+
+\section{2D Instance Segmentation}
+-  Instance segmentation is a fundamental computer vision task, which 
+
+- identifies individual objects within an image and predicts theirs corresponding per-pixel segmentation mask.
+- predicts each object instance and its corresponding per-pixel segmentation mask
+
+- most methods under-perform in severely occluded scenarios
+- As a result, objects are either not detected at all, or the 2D bounding boxes and segments are truncated and produce errors in downstream processes such as 3D reconstruction 
+
+
+\section{2D Amodal Instance Segmentation}
+\hl{TODO. Literature review phase: AISFormer, WALT, C2F Seg, etc. ?}
+
+- predicting the shape of occluded objects in addition to the visible parts. 
+- aims to segment the region of both visible and possible occluded parts of an object instance.
+-  predicts both the visible and amodal masks of each object instance
+- aims to extract complete shapes of objects in an image, including both visible and occluded parts.
+- aims to infer the amodal mask, including both the visible part and occluded part of each object instance.
+- amodal instance segmentation (AIS) [19, 37, 30] task poses a harder challenge that demands to predict both the visible and occluded part
+
+
+- Bilayer Convolutional Network (BCNet): model image formation as a composition of two overlapping layers, here the top layer detects occluding objects (occluders) and the bottom layer infers partially occluded instances (occludees). -> naturally decouples the boundaries of both the occluding and occluded instances, and considers the interaction between them during mask regression.
++ two separate image layers,
+
+
+- AISFormer: 
++ a transformer-based mask head. explicitly models the complex coherence be- tween occluder, visible, amodal, and invisible masks within an object’s regions of interest by treating them as learnable queries.
++ enhances the extraction of the long-range dependency via transformers, and utilizes multi-task train- ing to learn a more comprehensive segmentation model.
+
+
+- Coarse-to-Fine Segmentation (C2F-Seg): consists of a mask-and-predict transformer module for coarse masks and a convolutional refinement module for refined masks. It imitates human activity and progressively generates amodal segmentation, mitigating the effect of detrimental and ill-posed shape priors.
++We propose a new frame- work to learn generic object prior in vector-quantized latent space with transformer to predict the coarse amodal masks of occluded objects. Then we use a CNN-based refine mod- ule to polish up the coarse mask in pixel-level to get the fine amodal mask
++ use pre-detected visible bounding boxes and masks by AISFormer  -> we use by fine-tune YOLOv8
+
+
+SaVos [35] leverages spatiotemporal consistency and dense object motion to alleviate this prob- lem. However, SaVos requires additional knowledge of op- tical flow known to cause object deformation in the pres- ence of camera motion.
+
+- public big AIS dataset: 
++ COCOA [39] is derived from COCO dataset [17]. It consists of 2,476 im- ages in the training set and 1,223 images in the testing set. There are 80 objects in this dataset. 
++ KINS [24] is a large-scale amodal instance dataset, which is built upon KITTI [10]. It contains 7 categories that are common on the road, including car, truck, pedestrian, etc. There are 14,991 manually annotated images in total, 7,474 of which are used for training and the remaining for testing.

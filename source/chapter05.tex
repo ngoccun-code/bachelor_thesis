@@ -1,0 +1,35 @@
+% !TeX spellcheck = en_US
+\chapter{Evaluation / Experimentsk}%
+- In order to evaluate the performance 
+- we conduct experiments on 
+- All experiments are conducted on a single 2080Ti GPU card
+- For 512×512 images, E2EC achieved a 36 fps inference speed on an NVIDIA A6000 GPU
+
+\section{Evaluation Metrics}
+
+- 2D object detection / segmentation:  Average Precision (AP) 
+- 3D object detection (Providentia Mono3D): also  Average Precision (AP) 
+
+
+
+- We choose the mean Intersection over Union (mIoU) and mean Average Precision (mAP) as metrics for performance evaluation
+- For evaluation, we adopt standard metrics as in most amodal segmentation literature , namely mean average precision (AP). Furthermore, We use mean-IoU to measure the quality of predicted masks.
+- In this paper, the mask quality is evaluated in terms of the standard AP metric.
+
+\section{Quantitative results}
+
+
+\section{Qualitative results}
+
+\section{Inference Speed}
+
+- 1-2 sentences: what is TensorRT
+- Pytorch model → tensorRT
+
+- Model performance on RTX-3090 GPU
+- Yolov7-640 models achieve frame-rates between 55 and 60 FPS on the RTX-3090 GPU
+- Yolov7-1280 achieves 22 FPS, and Yolov7-1920 reaches only 12 FPS
+- how many \% speed up? TensorRT vs. .pt
+
+
+- problems with detecting the instance masks of large objects near the camera.

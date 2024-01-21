@@ -1,0 +1,53 @@
+% !TeX spellcheck = en_US
+\chapter{Implementation Details / Solution Approach}%
+
+There are some big autonomous driving datasets with instance segmentation masks like NuScene, KITTI, Cityscape and COCO (sub-classes). Some of them were extended to amodal segmentation dataset (full mask) such as KINS dataset from KITTI and COCOA from COCO. The prior Providentia Mono3D system use YOLOv7 model pre-trained on COCO dataset. The new YOLOv8 model that is adapted in this work also have weights pre-trained on COCO. However, data in COCO has eighty classes, from which only six classes overlap with our TUM Traffic dataset. This possess some limitations. Firstly, occlusion with classes that are not considered in our dataset will cause big blobs in the detected mask.  \hl{add an example figure}. Secondly, the classes TRAILER, VAN and EMERGENCY \_VEHICLE are not in COCO and will either not be detected or detected with another classe label. To address these limitations, in this work, we propose training/ fine-tuning the 2d detector on our dataset. This will not only overcome the problem with unmatched classes but also lead to better detection as the model will learn to detect from our camera setting (angle, distance, etc.). 
+
+
+\section{Visible and full instance segmentation annotation for TUMTraf dataset}
+
+TUMTraf dataset has 2D keypoints and 3D bounding box labels but no segmentation masks, so we can not directly use the dataset to train instance segmentation models. In this work, we extended the TUM Traffic Intersection dataset with visible and full instance mask labels. The OpenLABEL annotation schema for TUMTraf dataset is extended like the following: \hl{show the extended masks and visible boxes}. The additionaly \code{poly2d} contains the full and visible masks. The masks are stored as lists of 2D coordinate of the polygon contours. The \code{bbox} is extended with a full bounding box. 
+
+And how did we set the value for the instance masks? We use YOLO pre-trained on COCO to automatically detect the objects visible masks. The detections were then loaded into Computer Vision Annotation Tool (CVAT), where the visible masks will be manually refined and extended to full masks. We have tried our best to accurately annotate the full mask by searching for the objects occludded part in another frame where it is visible. This manually annotation process was only done for each tenth frames (10\% of the dataset), the remaining frames in the middle were annotated automatically with a simple 2D detection interpolation pipeline. This works and is meaningful because, as described earlier in section 3.2, the TUMTraf Intersection dataset contains four scenes (videos), so interpolation makes scene and works.   
+
+The frames are first sorted in ascending chronological order, then for each pair of consecutive labeled frames, the objects annotations are interpolated from the first frame to the second frame. The steps can be summarized as follow: 
+\begin{enumerate}
+	\item A 2D distance matrix $D$ of shape $N \times M$  is created, with $N$ and $M$  are the amount of object's annotation of first frame and second frame respectively. Each cell $D[i,j]$ is the straight-line distance (aka. Euclidean distance) of the center of the i-th object from first frame to the center of the j-th object from second frame. In case the categories of the two objects are not identical, the distance is set to infinity. 
+	
+	\[ D(i,j) = \begin{cases} 
+		\sqrt{{(x_{\text{{center}}_i} - x_{\text{{center}}_j})^2 + (y_{\text{{center}}_i} - y_{\text{{center}}_j})^2}} & \text{if } \text{{category}}_i = \text{{category}}_j \\
+		\infty & \text{otherwise}
+	\end{cases} \]
+	
+	This matrix is then given to \code{scipy.optimize.linear\_sum\_assignment()}to match each object annotation of the first frame to one object annotation of the second frame. The \code{scipy.optimize.linear\_sum\_assignment()} function exploits the Jonker-Volgenant algorithm to match objects with minimal distance. %\cite{scipyLSA} 
+	
+	\item For each pair of matched object annotations, the visible and full masks are interpolated. We again match each polygon point of the first object mask with one polygon point of the second object mask. Then linear interpolation is used to interpolate each single polygon point. 
+	
+	\[
+	x_k = x_0 + \frac{{x_1 - x_0}}{{n + 1}} \cdot k
+	\]
+	\[
+	y_k = y_0 + \frac{{y_1 - y_0}}{{n + 1}} \cdot k
+	\]
+	
+	With \(n\) being the number of un-annotated frames in the middle, \(k \in [1, n]\), and \((x_0, y_0)\) and \((x_1, y_1)\) being the matched polygon point from the first frame and the second frame, respectively.
+	
+	\item Bounding boxes are then calculated from the masks, object category and other attributes are copied over.  
+\end{enumerate}
+
+This 2D detection interpolation pipeline is not just copying and pasting the bounding boxes and masks and interpolate the position. Each point of the polygon contour of the mask is interpolated individually. Thereby, not only the position, but also the shape and rotation of the object are interpolated and provide much more accurate labels that do not require too much refinement later \hl{add an example figure}. 
+
+One limitation/ challenge that can still be improved is the matching of objects from the first frame to objects from the last frames. The current used linear sum assignment problem approach fails when not all objects in the first frame are still exit in the last fram and vice versa \hl{add an example figure}. Besides, one false matching can lead to a chain of errors since each object can only be matched to one other object \hl{add an example figure}. One possible solution/ future work would be to exploit tracking algorithm to better match/track objects between frames. 
+
+
+\section{Fine tune YOLOv8x-seg on TUMTraf dataset}
+- train using a batch size of ... on ... 
+- The total number of iterations is set to ...
+- following the standard ...
+
+\section{Export YOLO models to TensorRT and integrate into the toolchain}
+
+\section{Fine tune C2F\_seg on TUMTraf dataset}
+
+
+
