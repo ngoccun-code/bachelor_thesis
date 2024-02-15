@@ -1,0 +1,12 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log 
+*.out
+paper/*.xml
+paper/*.gz
+*.toc
+*.upa
+*.upb
+*.pdf
