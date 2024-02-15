@@ -216,7 +216,7 @@ For each input frame, the detector node publishes an output array of detected in
 
 Additionally, 2D visualizations and OpenLABEL detection files can generated for further analysis and debugging.
 
-\subsection{Training different YOLOv8 models}
+\subsection{Training YOLOv8 Models}
 
 Training different YOLOv8 models is a crucial aspect of this work. We choose the YOLOv8x, the largest model that promises the best accuracy, and train different model weights and evaluate their performance on the TUMTraf Intersection Dataset as well as their general generalization capabilities. The above-mentioned annotated split of the TUMTraf Intersection Dataset is converted to YOLO's required data structure as preparation for training. 
 
@@ -232,7 +232,7 @@ To preserve the real-time performance of the Providentia system, we export the m
 
 The exportation of the YOLOv8x model from Pytorch to TensorRT format significantly boosts the inference speed, nearly tripling it from 10 frames-per-second (FPS) to 28 FPS for inference at an image resolution of 1920x1920, and from 66 FPS to 200 FPS for an image resolution of 640x640.
 
-\subsection{Training C2F model}
+\subsection{Training C2F Model}
 
 Since the YOLOv8x model trained on the TUM Traffic Intersection dataset from scratch has achieved the best performance improvement in visible 2D segmentation, we leverage its detections to extend them to amodal masks using the C2F-seg model. First, we adapt and fine-tune the C2F-seg amodal segmentation model on the TUMTraf Intersection Dataset. Subsequently, we give it the visible detections as inputs and generate amodal detections, which are then passed to the subsequent 3D detector to produce the final 3D bounding boxes.
 
